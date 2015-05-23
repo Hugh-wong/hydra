@@ -4,15 +4,17 @@ producer-consumer based python task engine
 
 ## When to use?
 
-* when your backend task is too much, and want to done as soon as possible.
+* when your backend task is too much, and want to be done as soon as possible.
 
 ## Usage
 
-    # define or import your retrieve_items and consume functions here
+```python
+# define or import your retrieve_items and consume functions here
 
-    from hydra.manager import Manager
-    cfg_list = [{'retrieve_items':  retrieve_items, 'consume': consume_item, 'consumer_count':2, 'working_time': [('00:00', '23:59')]}]
-    Manager.trigger(**cfg_list)
+from hydra.manager import Manager
+cfg_list = [{'retrieve_items':  retrieve_items, 'consume': consume_item, 'consumer_count':2, 'working_time': [('00:00', '23:59')]}]
+Manager.trigger(**cfg_list)
+```
 
 ## How to define a retrieve_items fucntion?
 
