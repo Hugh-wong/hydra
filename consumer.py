@@ -10,7 +10,7 @@ def ignore_signal():
     signal.signal(signal.SIGTERM, signal.SIG_IGN)
 
 class Consumer(Process):
-    """A Consumer inherit from process, get task from queue, and run until told to stop"""
+    """A Consumer inherit from multiprocessing.Process, get item from queue, and run until told to stop"""
 
     def __init__(self, queue, poison, consume):
         super(Consumer, self).__init__()
@@ -26,5 +26,5 @@ class Consumer(Process):
                 self.consume(item)
             except QueueIsEmpty:
                 time.sleep(10)
-            except Exception, e:
+            except Exception:
                 time.sleep(2)

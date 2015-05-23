@@ -7,7 +7,7 @@ from multiprocessing import Process, Queue, Event
 from consumer import Consumer, ignore_signal
 
 class Allocator(object):
-    """A Allocator manage multi consumers, feed them with tasks"""
+    """A Allocator manage multi consumers, feed them with items"""
 
     def __init__(self, retrieve_items, consume, consumer_count, working_time, poison):
         self.retrieve_items = retrieve_items
@@ -22,10 +22,14 @@ class Allocator(object):
         if not working_time:
             result_list = ((datetime.time(0, 0), datetime.time(23, 59)),)
         else:
-            for i in working_time:
-                result_list.append((datetime.time(*map(int, i[0].split(':'))),
-                                    datetime.time(*map(int, i[1].split(':')))
-                                    ))
+            try:
+                for i in working_time:
+                    result_list.append((datetime.time(*map(int, i[0].split(':'))),
+                                        datetime.time(*map(int, i[1].split(':')))
+                                        ))
+            except Exception:
+                print "wrong working_time, raw is %s, using default working_time" % working_time
+                result_list = ((datetime.time(0, 0), datetime.time(23, 59)),)
         return result_list
 
     def is_time_todo(self):
