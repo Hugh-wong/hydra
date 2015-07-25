@@ -6,7 +6,7 @@ But there are a few differences between the ParallelPython.
 * Continual running  without stop
 * Can be paused any time
 
-Yes, it's more like the famous task engie, the `celery`, but more lightweight.
+Yes, it's more like the task engie, `celery`, but more lightweight.
 
 ## When to use ?
 
@@ -15,15 +15,14 @@ Tasks are in numbers, and want to be finished as soon as possible.
 
 ## How to use ?
 
-### define a GET method
+#### define a GET method
 
 Use your own `retrieve_items` method, to load tasks from files, DBs, caches or anywhere you want.
 And if you run hydra on several machines, you'd better use some lock system to avoid load the same data.
 
-### define a RUN method
+#### define a RUN method
 
 Use your own `consume` method, to run the task from the `retrieve_items`.
-
 
 Check the `test.py` to see how to use this.
 
@@ -35,7 +34,7 @@ Check the `test.py` to see how to use this.
 海德拉是希腊神话中的九头蛇怪，砍掉一个头，马上会再生出两个，最后被海格力斯所打败。
 为什么命名为海德拉，是因为语言是python，如果每个进程算一个头的话，确实是多头的生物。在死掉一两个头也确实不会造成太大的影响。
 
-## 详细介绍
+### 详细介绍
 
 >Item（商品）：
 
