@@ -35,7 +35,7 @@ class Allocator(object):
     def is_time_todo(self):
         nowtime = datetime.datetime.now().time()
         for i in self.working_time:
-            if i[1] >= nowtime and i[0] <= nowtime:
+            if i[1] >= nowtime >= i[0]:
                 return True
         return False
 

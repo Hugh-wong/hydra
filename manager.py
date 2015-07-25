@@ -3,7 +3,9 @@
 import sys
 import signal
 import time
-from allocator import Allocator, Process, Event
+from multiprocessing import Process
+
+from allocator import Allocator, Event
 
 class Manager(object):
     """A manager manage multi allocators, when told to stop, manager would tell the allocator to stop."""
