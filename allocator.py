@@ -80,8 +80,12 @@ class Allocator(object):
         else:
             return []
 
-    def stop(self):
+    def stop(self, timeout = None):
         for poison in self.consumer_poison_list:
             poison.set()
         for consumer in self.consumer_list:
-            consumer.join()
+            consumer.join(timeout)
+            if timeout and consumer.is_alive(): # kill the process if timeouts
+                consumer.terminate()
+                consumer.join()
+

@@ -44,5 +44,7 @@ class Manager(object):
         signal.signal(signal.SIGINT, manager.stop_all)
         signal.signal(signal.SIGTERM, manager.stop_all)
 
-        while True:
+        while True: # dead loop might meets many problem, better using a finite loop.
             time.sleep(2)
+
+        manager.stop_all(None, None)
