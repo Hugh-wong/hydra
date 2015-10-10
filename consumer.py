@@ -7,10 +7,14 @@ from multiprocessing import Process
 
 def ignore_signal():
     signal.signal(signal.SIGINT, signal.SIG_IGN)
-    signal.signal(signal.SIGTERM, signal.SIG_IGN)
+    # signal.signal(signal.SIGTERM, signal.SIG_IGN)
 
 class Consumer(Process):
-    """A Consumer inherit from multiprocessing.Process, get item from queue, and run until told to stop"""
+    """A Consumer inherit from multiprocessing.Process, get item from queue, and run until told to stop
+	 queue: item中介者，这里就是一个进程安全的队列
+    poison: 毒药，在发作前一直工作
+    consume: 消费方法，由具体的业务指定
+	"""
 
     def __init__(self, queue, poison, consume):
         super(Consumer, self).__init__()

@@ -3,21 +3,30 @@
 import datetime
 import time
 from Queue import Full as QueueIsFull
-from multiprocessing import Process, Queue, Event
+from multiprocessing import Queue, Event
+
 from consumer import Consumer, ignore_signal
 
 class Allocator(object):
-    """A Allocator manage multi consumers, feed them with items"""
+    """A Allocator manage multi consumers, feed them with items
+	retrieve_items: 取item的方法，由具体业务决定
+    consume: 消费item的方法，由业务决定，传递给consumer
+    consumer_count: 消费者个数
+    working_time: 工作时间，形如[('00:00', '12:00')]
+    poison: 分配者自身的毒药	
+	"""
 
-    def __init__(self, retrieve_items, consume, consumer_count, working_time, poison):
+    def __init__(self, retrieve_items, consume, consumer_count, working_time, poison, consume_timeout = None):
         self.retrieve_items = retrieve_items
         self.consume = consume
         self.consumer_count = consumer_count
         self.queue = Queue(consumer_count)
         self.working_time = self.parse_working_time(working_time)
         self.poison = poison
+        self.consume_timeout = consume_timeout
 
     def parse_working_time(self, working_time):
+        """解析工作时间"""
         result_list = []
         if not working_time:
             result_list = ((datetime.time(0, 0), datetime.time(23, 59)),)
@@ -33,6 +42,7 @@ class Allocator(object):
         return result_list
 
     def is_time_todo(self):
+        """当前是否是工作时间"""
         nowtime = datetime.datetime.now().time()
         for i in self.working_time:
             if i[1] >= nowtime >= i[0]:
@@ -40,6 +50,7 @@ class Allocator(object):
         return False
 
     def wake_consumer(self):
+        """唤醒消费者"""
         self.consumer_poison_list = []
         self.consumer_list = []
         for _ in xrange(self.consumer_count):
@@ -50,6 +61,7 @@ class Allocator(object):
             self.consumer_list.append(consumer)
 
     def add_items(self, item_list):
+        """将item放到broker中"""
         while item_list:
             try:
                 item = item_list.pop()
@@ -61,6 +73,7 @@ class Allocator(object):
                 time.sleep(20)
 
     def start(self):
+        """开始工作"""
         ignore_signal()
         self.wake_consumer()
         while not self.poison.is_set():
@@ -72,6 +85,7 @@ class Allocator(object):
         self.stop()
 
     def get_items(self, need_count):
+        """从仓库中取items"""
         if need_count > 0:
             try:
                 return self.retrieve_items(need_count)
@@ -80,12 +94,13 @@ class Allocator(object):
         else:
             return []
 
-    def stop(self, timeout = None):
+    def stop(self):
+        """将消费者的毒药激活，并等待他们执行完毕"""
         for poison in self.consumer_poison_list:
             poison.set()
         for consumer in self.consumer_list:
-            consumer.join(timeout)
-            if timeout and consumer.is_alive(): # kill the process if timeouts
+            consumer.join(self.consume_timeout)
+            if self.consume_timeout and consumer.is_alive():  # kill the process if timeouts
                 consumer.terminate()
                 consumer.join()
 
