@@ -11,9 +11,9 @@ def ignore_signal():
 
 class Consumer(Process):
     """A Consumer inherit from multiprocessing.Process, get item from queue, and run until told to stop
-	 queue: itemÖĞ½éÕß£¬ÕâÀï¾ÍÊÇÒ»¸ö½ø³Ì°²È«µÄ¶ÓÁĞ
-    poison: ¶¾Ò©£¬ÔÚ·¢×÷Ç°Ò»Ö±¹¤×÷
-    consume: Ïû·Ñ·½·¨£¬ÓÉ¾ßÌåµÄÒµÎñÖ¸¶¨
+	 queue: itemä¸­ä»‹è€…ï¼Œè¿™é‡Œå°±æ˜¯ä¸€ä¸ªè¿›ç¨‹å®‰å…¨çš„é˜Ÿåˆ—
+    poison: æ¯’è¯ï¼Œåœ¨å‘ä½œå‰ä¸€ç›´å·¥ä½œ
+    consume: æ¶ˆè´¹æ–¹æ³•ï¼Œç”±å…·ä½“çš„ä¸šåŠ¡æŒ‡å®š
 	"""
 
     def __init__(self, queue, poison, consume):

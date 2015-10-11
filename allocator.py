@@ -9,11 +9,11 @@ from consumer import Consumer, ignore_signal
 
 class Allocator(object):
     """A Allocator manage multi consumers, feed them with items
-	retrieve_items: È¡itemµÄ·½·¨£¬ÓÉ¾ßÌåÒµÎñ¾ö¶¨
-    consume: Ïû·ÑitemµÄ·½·¨£¬ÓÉÒµÎñ¾ö¶¨£¬´«µİ¸øconsumer
-    consumer_count: Ïû·ÑÕß¸öÊı
-    working_time: ¹¤×÷Ê±¼ä£¬ĞÎÈç[('00:00', '12:00')]
-    poison: ·ÖÅäÕß×ÔÉíµÄ¶¾Ò©	
+	retrieve_items: å–itemçš„æ–¹æ³•ï¼Œç”±å…·ä½“ä¸šåŠ¡å†³å®š
+    consume: æ¶ˆè´¹itemçš„æ–¹æ³•ï¼Œç”±ä¸šåŠ¡å†³å®šï¼Œä¼ é€’ç»™consumer
+    consumer_count: æ¶ˆè´¹è€…ä¸ªæ•°
+    working_time: å·¥ä½œæ—¶é—´ï¼Œå½¢å¦‚[('00:00', '12:00')]
+    poison: åˆ†é…è€…è‡ªèº«çš„æ¯’è¯	
 	"""
 
     def __init__(self, retrieve_items, consume, consumer_count, working_time, poison, consume_timeout = None):
@@ -26,7 +26,7 @@ class Allocator(object):
         self.consume_timeout = consume_timeout
 
     def parse_working_time(self, working_time):
-        """½âÎö¹¤×÷Ê±¼ä"""
+        """è§£æå·¥ä½œæ—¶é—´"""
         result_list = []
         if not working_time:
             result_list = ((datetime.time(0, 0), datetime.time(23, 59)),)
@@ -42,7 +42,7 @@ class Allocator(object):
         return result_list
 
     def is_time_todo(self):
-        """µ±Ç°ÊÇ·ñÊÇ¹¤×÷Ê±¼ä"""
+        """å½“å‰æ˜¯å¦æ˜¯å·¥ä½œæ—¶é—´"""
         nowtime = datetime.datetime.now().time()
         for i in self.working_time:
             if i[1] >= nowtime >= i[0]:
@@ -50,7 +50,7 @@ class Allocator(object):
         return False
 
     def wake_consumer(self):
-        """»½ĞÑÏû·ÑÕß"""
+        """å”¤é†’æ¶ˆè´¹è€…"""
         self.consumer_poison_list = []
         self.consumer_list = []
         for _ in xrange(self.consumer_count):
@@ -61,7 +61,7 @@ class Allocator(object):
             self.consumer_list.append(consumer)
 
     def add_items(self, item_list):
-        """½«item·Åµ½brokerÖĞ"""
+        """å°†itemæ”¾åˆ°brokerä¸­"""
         while item_list:
             try:
                 item = item_list.pop()
@@ -73,7 +73,7 @@ class Allocator(object):
                 time.sleep(20)
 
     def start(self):
-        """¿ªÊ¼¹¤×÷"""
+        """å¼€å§‹å·¥ä½œ"""
         ignore_signal()
         self.wake_consumer()
         while not self.poison.is_set():
@@ -85,7 +85,7 @@ class Allocator(object):
         self.stop()
 
     def get_items(self, need_count):
-        """´Ó²Ö¿âÖĞÈ¡items"""
+        """ä»ä»“åº“ä¸­å–items"""
         if need_count > 0:
             try:
                 return self.retrieve_items(need_count)
@@ -95,7 +95,7 @@ class Allocator(object):
             return []
 
     def stop(self):
-        """½«Ïû·ÑÕßµÄ¶¾Ò©¼¤»î£¬²¢µÈ´ıËûÃÇÖ´ĞĞÍê±Ï"""
+        """å°†æ¶ˆè´¹è€…çš„æ¯’è¯æ¿€æ´»ï¼Œå¹¶ç­‰å¾…ä»–ä»¬æ‰§è¡Œå®Œæ¯•"""
         for poison in self.consumer_poison_list:
             poison.set()
         for consumer in self.consumer_list:

@@ -1,31 +1,38 @@
 # coding=utf-8
 
-import time
+import math
 import random
 from manager import Manager
-from multiprocessing import Lock
 
-
-lock = Lock()
 
 def retrieve_items(need_count):
-    with lock:
-        print 'need_count = %s' % need_count
+    return [random.randint(300000, 600000) for _ in xrange(need_count)]
 
-    return range(need_count)
 
-def consume_item(item_id):
-    t = random.randint(10, 15)
-    with lock:
-        print '%s is consumed... and need to exec %s seconds' % (item_id, t)
-    time.sleep(t)
+def is_prime(n):
+    if not isinstance(n, int):
+        raise TypeError("argument passed to is_prime is not of 'int' type")
+    if n < 2:
+        return False
+    if n == 2:
+        return True
+    max = int(math.ceil(math.sqrt(n)))
+    i = 2
+    while i <= max:
+        if n % i == 0:
+            return False
+        i += 1
+    return True
 
-    with lock:
-        print "%s is done, now quit." % (item_id)
+def consume_item(n):
+    return sum([x for x in xrange(2,n) if is_prime(x)])
 
 
 if __name__ == "__main__":
-
-    cfg_list = [{'retrieve_items':  retrieve_items, 'consume': consume_item, 'consume_timeout': 20, 'consumer_count':2, 'working_time': [('00:00', '23:59')]}]
-
+    cfg_list = [{'retrieve_items':  retrieve_items,
+                 'consume': consume_item,
+                 'consume_timeout': 20,
+                 'consumer_count':4,
+                 'working_time': [('00:00', '23:59')]
+                 }]
     Manager.trigger(cfg_list)
