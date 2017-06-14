@@ -7,6 +7,7 @@ from multiprocessing import Process
 
 from allocator import Allocator, Event
 
+
 class Manager(object):
     """A manager manage multi allocators, when told to stop, manager would tell the allocator to stop."""
 
@@ -23,7 +24,7 @@ class Manager(object):
         """start all the allocators"""
         self.process_list = []
         for allocator in self.allocator_list:
-            process = Process(target = allocator.start)
+            process = Process(target=allocator.start)
             process.start()
             self.process_list.append(process)
 
@@ -44,7 +45,7 @@ class Manager(object):
         signal.signal(signal.SIGINT, manager.stop_all)
         signal.signal(signal.SIGTERM, manager.stop_all)
 
-        while True: # dead loop might meets many problem, better using a finite loop.
+        while True:  # dead loop might meets many problem, better using a finite loop.
             time.sleep(2)
 
         manager.stop_all(None, None)

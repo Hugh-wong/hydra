@@ -24,15 +24,16 @@ def is_prime(n):
         i += 1
     return True
 
+
 def consume_item(n):
-    return sum([x for x in xrange(2,n) if is_prime(x)])
+    return sum([x for x in xrange(2, n) if is_prime(x)])
 
 
 if __name__ == "__main__":
-    cfg_list = [{'retrieve_items':  retrieve_items,
+    cfg_list = [{'retrieve_items': retrieve_items,
                  'consume': consume_item,
                  'consume_timeout': 20,
-                 'consumer_count':4,
+                 'consumer_count': 4,
                  'working_time': [('00:00', '23:59')]
                  }]
     Manager.trigger(cfg_list)

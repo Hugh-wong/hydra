@@ -7,16 +7,17 @@ from multiprocessing import Queue, Event
 
 from consumer import Consumer, ignore_signal
 
+
 class Allocator(object):
     """A Allocator manage multi consumers, feed them with items
-	retrieve_items: 取item的方法，由具体业务决定
+    retrieve_items: 取item的方法，由具体业务决定
     consume: 消费item的方法，由业务决定，传递给consumer
     consumer_count: 消费者个数
     working_time: 工作时间，形如[('00:00', '12:00')]
     poison: 分配者自身的毒药	
-	"""
+    """
 
-    def __init__(self, retrieve_items, consume, consumer_count, working_time, poison, consume_timeout = None):
+    def __init__(self, retrieve_items, consume, consumer_count, working_time, poison, consume_timeout=None):
         self.retrieve_items = retrieve_items
         self.consume = consume
         self.consumer_count = consumer_count
@@ -55,7 +56,7 @@ class Allocator(object):
         self.consumer_list = []
         for _ in xrange(self.consumer_count):
             tmp_poison = Event()
-            consumer = Consumer(queue = self.queue, poison = tmp_poison, consume = self.consume)
+            consumer = Consumer(queue=self.queue, poison=tmp_poison, consume=self.consume)
             consumer.start()
             self.consumer_poison_list.append(tmp_poison)
             self.consumer_list.append(consumer)
@@ -65,7 +66,7 @@ class Allocator(object):
         while item_list:
             try:
                 item = item_list.pop()
-                self.queue.put(item, block = True, timeout = 1)
+                self.queue.put(item, block=True, timeout=1)
             except IndexError:
                 break
             except QueueIsFull:
@@ -78,7 +79,7 @@ class Allocator(object):
         self.wake_consumer()
         while not self.poison.is_set():
             if self.is_time_todo():
-                item_list = self.get_items(need_count = self.consumer_count - self.queue.qsize())
+                item_list = self.get_items(need_count=self.consumer_count - self.queue.qsize())
                 self.add_items(item_list)
             time.sleep(10)
 
@@ -103,4 +104,3 @@ class Allocator(object):
             if self.consume_timeout and consumer.is_alive():  # kill the process if timeouts
                 consumer.terminate()
                 consumer.join()
-
